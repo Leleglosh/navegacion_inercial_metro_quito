@@ -29,7 +29,6 @@ def cargar_csv_serial(ruta_csv):
     Lee un archivo CSV obtenido mediante el Monitor Serie de Arduino IDE.
     Parámetros:
         ruta_csv (str): Ruta al archivo .csv o .txt guardado.
-        
     Retorna:
         pd.DataFrame: Datos cargados con marcas de tiempo relativas en segundos.
     """
