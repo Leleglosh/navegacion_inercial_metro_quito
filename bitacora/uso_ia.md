@@ -1,4 +1,3 @@
-
 ## Caso 001 — Identificación incorrecta del sensor inercial
 
 **Fecha:** 21/11/2026
@@ -20,7 +19,7 @@ Como el código esperaba exclusivamente `0x71` para el sensor inercial, la ejecu
 
 #### Evidencia de la salida en el monitor serial de Arduino IDE
 
-![1795305064002](../documentacion/fotografias/1795305064002.png)
+![1795315085838](../documentacion/fotografias/1795315085838.png)
 
 ### Verificación
 
