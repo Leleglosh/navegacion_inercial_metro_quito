@@ -7,7 +7,7 @@ Este script implementa:
 import os
 import numpy as np
 import pandas as pd
-
+ 
 # 1. ESTRUCTURA BINARIA EXACTA DE 36 BYTES (FIRMWARE ESP32)
 # Define la disposición exacta de los bytes grabados en el archivo LOGnnnn.BIN.
 # Usamos tipos Little-Endian ('<') coincidiendo con la arquitectura del ESP32.
