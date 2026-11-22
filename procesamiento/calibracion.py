@@ -11,7 +11,7 @@ import pandas as pd
 def calibrar_giroscopio(df_reposo):
     """
     Calcula el sesgo (bias) estático del giroscopio a partir de un registro en reposo.
-    Parámetros:
+    Parámetros: 
         df_reposo (pd.DataFrame): DataFrame que contiene las columnas 'gx', 'gy', 'gz'
                                   (en grados/segundo o en LSB crudos).
     Retorna:
