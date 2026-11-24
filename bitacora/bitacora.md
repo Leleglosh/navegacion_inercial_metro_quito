@@ -1,7 +1,6 @@
 ## Entrada 001 — Adquisición de componentes
 
 **Fecha:** 20/11/2026
-**Responsables:** Stephanie Lozada
 **Actividad:** Compra de los componentes para la elaboración del proyecto
 
 ### Objetivo
@@ -40,7 +39,6 @@ Se utilizó IA para comparar compatibilidad y planificar el montaje. Sus recomen
 ## Entrada 002 — Identificación de componentes y preparación del ensamblaje
 
 **Fecha:** 21 de noviembre de 2026
-**Responsables:** Stephanie Lozada
 **Actividad:** Inspección física de los componentes y preparación del primer montaje.
 
 ### Objetivo
@@ -92,7 +90,6 @@ Se utilizó ChatGPT como apoyo para interpretar las etiquetas de los componentes
 ## Entrada 003 — Comunicación I²C y primera adquisición de datos crudos
 
 **Fecha:** 21/11/2026
-**Responsable:** Stephanie Lozada
 **Actividad:** Configuración del ESP32, identificación de sensores y adquisición inicial de datos.
 
 ### Objetivo
