@@ -116,6 +116,7 @@ El escaneo I²C permitió identificar dos dispositivos:
 
 Se obtuvieron las primeras mediciones crudas, por ejemplo:
 
+
 ```text
 t_us,ax_raw,ay_raw,az_raw,gx_raw,gy_raw,gz_raw,p_raw,t_raw
 44861950,712,142,-15858,-46,67,13,479888,534000
@@ -176,3 +177,75 @@ Se detectó una limitación en el código sugerido inicialmente por la IA, ya qu
 - Incorporar un pulsador para registrar eventos.
 - Implementar el almacenamiento de datos crudos a una frecuencia mínima de 100 Hz.
 - Procesar los registros mediante Python para obtener gráficas en unidades físicas.
+
+
+
+## Entrada 004 — Integración y verificación del módulo de almacenamiento microSD
+
+**Fecha:** 24-11-2026
+**Actividad:** Conexión del módulo microSD SPI y comprobación de lectura y escritura de archivos.
+
+### Objetivo
+
+Incorporar un sistema de almacenamiento al prototipo de navegación inercial para guardar los datos obtenidos por los sensores sin depender del monitor serie de Arduino IDE.
+
+### Componentes utilizados
+
+- ESP32-WROOM-32D.
+- Módulo lector microSD SPI.
+- Tarjeta microSD de 16 GB.
+- Cables Dupont.
+- Cable micro-USB de datos.
+
+### Procedimiento
+
+1. Se mantuvo la conexión I²C previamente establecida entre el ESP32 y el módulo GY-91.
+2. Se identificaron los seis pines del lector microSD: CS, SCK, MOSI, MISO, VCC y GND.
+3. Se conectó el lector al ESP32 mediante el protocolo SPI, utilizando GPIO13 para CS, GPIO18 para SCK, GPIO23 para MOSI y GPIO19 para MISO.
+4. Se utilizó la alimentación correspondiente al módulo, que incorpora un regulador de 3,3 V.
+5. Se preparó la tarjeta microSD de 16 GB para su utilización con el sistema de archivos FAT32.
+6. Se desarrolló y ejecutó un programa de prueba utilizando las bibliotecas SPI.h y SD.h de Arduino.
+7. El programa inicializó la tarjeta, creó el archivo `prueba_sd.txt` y escribió información de prueba.
+8. Se comprobó que el archivo podía leerse correctamente después de la escritura.
+
+### Resultados obtenidos
+
+La prueba de almacenamiento fue exitosa. El ESP32 consiguió comunicarse con el lector microSD y escribir información en un archivo.
+
+Esto demuestra que el prototipo cuenta con un medio de almacenamiento funcional, necesario para guardar posteriormente los registros de aceleración, giro y presión.
+
+Sin embargo, todavía no se ha comprobado el funcionamiento a 100 muestras por segundo ni la estabilidad durante registros de larga duración.
+
+### Decisiones técnicas
+
+Se utilizó el protocolo SPI para comunicar el ESP32 con la tarjeta microSD, manteniendo el protocolo I²C para el sensor GY-91.
+
+Se decidió realizar primero una prueba independiente del almacenamiento antes de desarrollar el programa que integra todos los componentes, con el fin de facilitar la identificación de posibles errores.
+
+### Problemas encontrados
+
+No se reportaron errores de escritura o lectura durante la prueba final realizada.
+
+La comprobación de integridad de archivos después de una interrupción inesperada de energía queda pendiente.
+
+### Uso de inteligencia artificial
+
+Se utilizó ChatGPT como apoyo para identificar las conexiones SPI y elaborar el programa de prueba de almacenamiento.
+
+El código fue verificado mediante su ejecución en el ESP32, comprobando que la tarjeta podía almacenar y recuperar la información escrita.
+
+### Evidencias
+
+- Fotografía del módulo lector microSD conectado al ESP32.
+- Código `test_microSD.ino`.
+- Captura del monitor serie con el resultado de la prueba.
+- Archivo `prueba_sd.txt` generado durante el experimento.
+
+### Próximas actividades
+
+- Incorporar el pulsador para registrar eventos.
+- Integrar la lectura del GY-91 con la escritura en la microSD.
+- Guardar datos crudos en archivos CSV.
+- Implementar un muestreo objetivo de 100 Hz.
+- Comprobar los intervalos de adquisición y detectar posibles pérdidas de muestras.
+- Preparar el procesamiento y las gráficas mediante Python.
