@@ -38,7 +38,7 @@ Se utilizó IA para comparar compatibilidad y planificar el montaje. Sus recomen
 
 ## Entrada 002 — Identificación de componentes y preparación del ensamblaje
 
-**Fecha:** 21 de noviembre de 2026
+**Fecha:** 21/11/2026
 **Actividad:** Inspección física de los componentes y preparación del primer montaje.
 
 ### Objetivo
@@ -116,7 +116,6 @@ El escaneo I²C permitió identificar dos dispositivos:
 
 Se obtuvieron las primeras mediciones crudas, por ejemplo:
 
-
 ```text
 t_us,ax_raw,ay_raw,az_raw,gx_raw,gy_raw,gz_raw,p_raw,t_raw
 44861950,712,142,-15858,-46,67,13,479888,534000
@@ -178,11 +177,9 @@ Se detectó una limitación en el código sugerido inicialmente por la IA, ya qu
 - Implementar el almacenamiento de datos crudos a una frecuencia mínima de 100 Hz.
 - Procesar los registros mediante Python para obtener gráficas en unidades físicas.
 
-
-
 ## Entrada 004 — Integración y verificación del módulo de almacenamiento microSD
 
-**Fecha:** 24-11-2026
+**Fecha:** 24/11/2026
 **Actividad:** Conexión del módulo microSD SPI y comprobación de lectura y escritura de archivos.
 
 ### Objetivo
@@ -255,3 +252,152 @@ El código fue verificado mediante su ejecución en el ESP32, comprobando que la
 - Implementar un muestreo objetivo de 100 Hz.
 - Comprobar los intervalos de adquisición y detectar posibles pérdidas de muestras.
 - Preparar el procesamiento y las gráficas mediante Python.
+
+## Entrada 005 — Integración del sistema de adquisición y análisis de frecuencia de muestreo
+
+**Fecha:** 25/11/2026
+**Actividad:** Integración del GY-91, almacenamiento microSD y pulsador. Verificación del registro de datos crudos.
+
+### Objetivo
+
+Integrar los componentes principales del dispositivo de navegación inercial para registrar mediciones crudas de aceleración, velocidad angular, presión y temperatura, junto con sus marcas de tiempo y los eventos generados mediante el pulsador.
+
+También se buscó evaluar la frecuencia real de muestreo y verificar la existencia de posibles errores o pérdidas de muestras durante el almacenamiento.
+
+### Componentes utilizados
+
+- ESP32-WROOM-32D.
+- Módulo GY-91, con sensor inercial identificado como compatible con MPU-6500 y barómetro BMP280.
+- Módulo lector microSD SPI.
+- Tarjeta microSD de 16 GB.
+- Pulsador de dos patas.
+- Protoboard, cables Dupont y cable micro-USB.
+
+### Procedimiento
+
+1. Se conservaron las conexiones I²C entre el ESP32 y el GY-91 mediante GPIO21 (SDA) y GPIO22 (SCL).
+2. Se integró el módulo microSD mediante SPI, utilizando GPIO13 (CS), GPIO18 (SCK), GPIO23 (MOSI) y GPIO19 (MISO).
+3. Se conectó el pulsador entre GPIO27 y GND, utilizando la resistencia pull-up interna del ESP32.
+4. Se desarrolló un programa de adquisición en Arduino IDE para registrar las lecturas crudas de los sensores directamente en un archivo CSV.
+5. Se utilizaron marcas de tiempo en microsegundos mediante `esp_timer_get_time()`.
+6. Se configuró una frecuencia objetivo de 100 Hz, equivalente a un período de muestreo de 10.000 microsegundos.
+7. Se incorporó un mecanismo de detección de eventos mediante pulsador, con un tiempo de estabilización de 30 ms para evitar registros múltiples por rebote.
+8. Se ejecutó una prueba de aproximadamente 60 segundos, durante la cual se presionó el pulsador cuatro veces.
+9. Se verificó la generación del archivo CSV y se analizó mediante Python utilizando las bibliotecas Pandas y NumPy.
+10. Se calcularon la frecuencia media, los intervalos entre mediciones, los intervalos omitidos, los fallos de comunicación y los eventos registrados.
+
+### Resultados obtenidos
+
+| Indicador                      | Resultado |
+| ------------------------------ | --------- |
+| Duración del registro         | 59,990 s  |
+| Muestras registradas           | 5.720     |
+| Frecuencia media               | 95,33 Hz  |
+| Intervalo promedio             | 10,490 ms |
+| Intervalo máximo              | 68,228 ms |
+| Intervalos mayores a 15 ms     | 115       |
+| Intervalos omitidos acumulados | 280       |
+| Fallos de comunicación I²C   | 0         |
+| Eventos del pulsador           | 4         |
+
+### Análisis de resultados
+
+Para una frecuencia de 100 Hz durante 60 segundos, se esperaban aproximadamente 6.000 muestras.
+
+Sin embargo, se registraron 5.720, con una frecuencia media de 95,33 Hz. El programa contabilizó 280 intervalos de muestreo omitidos, equivalentes aproximadamente al 4,67 % de los intervalos previstos.
+
+El intervalo promedio fue de 10,490 ms, ligeramente superior al período objetivo de 10 ms. Además, se observó un intervalo máximo de 68,228 ms y un total de 115 intervalos mayores a 15 ms.
+
+Estos resultados indican que el sistema todavía presenta irregularidades en el tiempo de adquisición.
+
+Una posible explicación es que algunas operaciones de almacenamiento en la microSD bloqueen temporalmente la ejecución del programa. También pueden influir los tiempos de comunicación con los sensores y otras operaciones del ciclo principal. Es necesario realizar pruebas adicionales para identificar las causas.
+
+Por otro lado, no se registraron fallos I²C, lo que indica que las lecturas realizadas no reportaron errores de comunicación.
+
+El pulsador funcionó correctamente durante la prueba, registrando cuatro eventos con sus respectivas marcas de tiempo.
+
+### Problemas encontrados
+
+**Frecuencia de muestreo inferior al requisito.**
+
+Aunque se programó una frecuencia objetivo de 100 Hz, el análisis del CSV mostró una frecuencia media de 95,33 Hz y varios intervalos de adquisición omitidos.
+
+Esto demuestra que establecer un período de muestreo en el código no garantiza que el dispositivo consiga mantenerlo durante el registro.
+
+### Decisiones técnicas
+
+Se decidió conservar los datos experimentales originales para utilizarlos como referencia en las siguientes pruebas.
+
+Como posible mejora, se evaluará aumentar la velocidad de comunicación I²C de 100 kHz a 400 kHz y probar una velocidad SPI mayor para la microSD, verificando los resultados después de cada modificación.
+
+Si estas medidas no son suficientes, se estudiará la implementación de un búfer de escritura para reducir el impacto del almacenamiento sobre el muestreo.
+
+### Uso de inteligencia artificial
+
+Se utilizó ChatGPT como apoyo para integrar el código de adquisición, implementar las marcas de tiempo y desarrollar el programa de verificación de registros en Python.
+
+Los resultados obtenidos experimentalmente permitieron identificar que, aunque el código estaba configurado para una frecuencia objetivo de 100 Hz, el dispositivo no lograba mantenerla de forma sostenida.
+
+Este resultado evidencia la necesidad de comprobar experimentalmente el comportamiento del código sugerido por la IA.
+
+### Evidencias
+
+- Código `adquisicion_esp32.ino`.
+- Archivo original `datos_001.csv`.
+- Archivo de configuración y calibración interna `calib_001.txt`.
+- Código de análisis `verificar.py`.
+- Captura de los resultados del análisis en Python.
+- Fotografías del montaje completo.
+
+### Pruebas adicionales de optimización de la frecuencia de muestreo
+
+Se realizaron dos pruebas adicionales de 60 segundos para evaluar el efecto de modificar las velocidades de comunicación del sistema.
+
+**Prueba CSV 003 — I²C a 400 kHz y SPI a 1 MHz**
+
+Se aumentó la velocidad de comunicación I²C de 100 kHz a 400 kHz, manteniendo la configuración anterior de la microSD.
+
+Se obtuvieron 5.708 muestras, una frecuencia media de 95,13 Hz y 292 intervalos de muestreo omitidos. El intervalo máximo fue de 70,977 ms y no se registraron errores I²C.
+
+Los resultados no mostraron una mejora respecto a la prueba inicial, que había alcanzado 95,33 Hz.
+
+**Prueba CSV 004 — I²C a 400 kHz y SPI a 4 MHz**
+
+Se mantuvo la velocidad I²C de 400 kHz y se aumentó la velocidad SPI de 1 MHz a 4 MHz.
+
+Se registraron 5.970 muestras durante 59,990 segundos, alcanzando una frecuencia media de 99,50 Hz.
+
+El número de intervalos omitidos disminuyó a 30, mientras que el intervalo máximo se redujo a 31,526 ms. También se registraron tres eventos mediante el pulsador y no se presentaron errores I²C.
+
+**Análisis comparativo**
+
+La segunda configuración produjo una mejora considerable. Respecto al CSV 003, la frecuencia media aumentó 4,37 Hz y los intervalos omitidos disminuyeron aproximadamente un 89,7 %.
+
+Estos resultados sugieren que la velocidad de comunicación con la microSD influye en el rendimiento del sistema. Sin embargo, se requieren pruebas adicionales para confirmar esta relación.
+
+Aunque se alcanzó una frecuencia media cercana a 100 Hz, todavía existen intervalos omitidos y pausas superiores al período de muestreo objetivo.
+
+**Decisiones y próximos pasos**
+
+Se decidió conservar la configuración I²C de 400 kHz y SPI de 4 MHz.
+
+Además, se identificó que el divisor de frecuencia interno del MPU-6500 estaba configurado para una actualización de 100 Hz. Se propone aumentar su frecuencia interna a 200 Hz y utilizar un período de adquisición de 9.500 microsegundos para evaluar si el registrador puede superar los 100 Hz reales.
+
+Las pruebas realizadas se conservarán en el repositorio para documentar el proceso de optimización y justificar las decisiones técnicas.
+
+### Estado del proyecto
+
+Se ha logrado integrar los sensores, el almacenamiento microSD y el pulsador en un mismo sistema de adquisición.
+
+El dispositivo puede registrar datos crudos y eventos en archivos que posteriormente se procesan mediante Python.
+
+La comunicación I²C no reportó fallos durante la prueba, pero la frecuencia media obtenida todavía es inferior a los 100 Hz requeridos. Por tanto, queda pendiente optimizar y verificar el rendimiento del sistema.
+
+### Próximas actividades
+
+- Realizar nuevas pruebas de frecuencia de muestreo.
+- Comparar los resultados antes y después de las modificaciones.
+- Generar gráficas de aceleración, velocidad angular y presión.
+- Realizar el experimento de reposo.
+- Realizar el experimento de seis caras para caracterizar y calibrar el acelerómetro.
+- Analizar el crecimiento del error mediante integración numérica.

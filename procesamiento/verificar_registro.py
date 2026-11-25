@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv("datos/crudos/datos_001.csv")
+df = pd.read_csv("datos/crudos/datos_006.csv")
 
 # Tiempos de adquisicion en segundos
 t = df["t_us"].to_numpy() / 1e6
@@ -13,6 +13,7 @@ duracion = t[-1] - t[0]
 frecuencia = (len(t) - 1) / duracion
 
 print("=== ANALISIS DEL REGISTRO ===")
+print("CSV 006")
 print("Muestras:", len(df))
 print(f"Duracion: {duracion:.3f} s")
 print(f"Frecuencia media: {frecuencia:.2f} Hz")
