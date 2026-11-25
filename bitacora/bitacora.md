@@ -237,9 +237,15 @@ El código fue verificado mediante su ejecución en el ESP32, comprobando que la
 ### Evidencias
 
 - Fotografía del módulo lector microSD conectado al ESP32.
-- Código `test_microSD.ino`.
+
+![](blob:https://web.whatsapp.com/904f3f51-5483-4d2a-82ab-907369979d25)![1795621656694](../documentacion/fotografias/1795621656694.png)
+
+- Código `test_microSD.ino` en firmware/pruebas.
 - Captura del monitor serie con el resultado de la prueba.
-- Archivo `prueba_sd.txt` generado durante el experimento.
+
+![1795621904550](../documentacion/fotografias/1795621904550.png)
+
+- Archivo `prueba_sd.txt` generado durante el experimento en firmware/archivos_txt_pruebas.
 
 ### Próximas actividades
 
