@@ -2,7 +2,7 @@
 
 Ejecutar desde la raiz del repositorio:
     python procesamiento/calibrar_seis_caras.py
-    python procesamiento/calibrar_seis_caras.py --gravedad 9.81
+    python procesamiento/calibrar_seis_caras.py --gravedad 9.7726
 
 Archivos esperados en datos/procesados/:
     datos_010_fisico.csv -Z, datos_011_fisico.csv +Z,
@@ -23,6 +23,8 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+from config_fisica import GRAVEDAD_QUITO_MS2
 
 MAPA = {
     '-Z': 'datos_010_fisico.csv',
@@ -76,7 +78,7 @@ def procesar(directorio: Path, salida: Path, reposo: Path, g: float):
     bias = np.zeros(3)
     scale = np.zeros(3)
     print('\n=== CALIBRACION DE SEIS CARAS ===')
-    print(f'Gravedad de referencia provisional: {g:.5f} m/s2')
+    print(f'Gravedad local de referencia (Quito): {g:.5f} m/s2')
     for i, eje in enumerate(EJES):
         clave = ['ax_media','ay_media','az_media'][i]
         pos = filas['+'+eje][clave]
@@ -113,7 +115,7 @@ def procesar(directorio: Path, salida: Path, reposo: Path, g: float):
         'escala_adimensional': {e:float(scale[i]) for i,e in enumerate(EJES)},
         'mapeo_archivos': MAPA,
         'limitaciones': [
-            'Gravedad de referencia provisional',
+            'Gravedad local de referencia del proyecto: Quito (9.7726 m/s2)',
             'Modelo diagonal: no corrige desalineacion, no ortogonalidad ni acoplamiento cruzado',
             'Posibles inclinaciones de las seis orientaciones',
             'No corrige orientacion, gravedad 3D ni sesgo del giroscopio',
@@ -146,7 +148,7 @@ def procesar(directorio: Path, salida: Path, reposo: Path, g: float):
     ax.bar(x-.18, error_antes, .36, label='Antes')
     ax.bar(x+.18, error_despues, .36, label='Despues')
     ax.set_xticks(x, orden)
-    ax.set_ylabel('Diferencia absoluta frente a g provisional (m/s2)')
+    ax.set_ylabel('Diferencia absoluta frente a g local (m/s2)')
     ax.set_title('Seis caras: error de magnitud antes y despues de calibrar')
     ax.legend()
     ax.grid(axis='y', alpha=.2)
@@ -195,7 +197,7 @@ def procesar(directorio: Path, salida: Path, reposo: Path, g: float):
         fig, ax = plt.subplots(figsize=(11,5))
         ax.plot(ts,raw_norm[::paso],label='Antes',alpha=.75)
         ax.plot(ts,cal_norm[::paso],label='Despues',alpha=.85)
-        ax.axhline(g,color='black',ls='--',label=f'g provisional={g:.3f}')
+        ax.axhline(g,color='black',ls='--',label=f'g local={g:.4f}')
         ax.set_xlabel('Tiempo (minutos)')
         ax.set_ylabel('Norma de aceleracion (m/s2)')
         ax.set_title('Reposo: validacion independiente de la calibracion de seis caras')
@@ -218,6 +220,6 @@ if __name__ == '__main__':
     p.add_argument('--directorio', type=Path, default=raiz/'datos'/'procesados', help='Carpeta con datos_010..015_fisico.csv')
     p.add_argument('--salida', type=Path, default=raiz/'resultados'/'calibracion', help='Carpeta de resultados')
     p.add_argument('--reposo', type=Path, default=raiz/'datos'/'procesados'/'datos_009_fisico.csv', help='CSV de reposo independiente')
-    p.add_argument('--gravedad', type=float, default=9.81, help='Gravedad de referencia (m/s2), provisional')
+    p.add_argument('--gravedad', type=float, default=GRAVEDAD_QUITO_MS2, help='Gravedad de referencia (m/s2), defecto: Quito 9.7726')
     args=p.parse_args()
     procesar(args.directorio,args.salida,args.reposo,args.gravedad)

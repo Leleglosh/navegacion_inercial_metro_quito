@@ -1,0 +1,43 @@
+{
+  "modelo": "aceleracion_calibrada_i=(aceleracion_nominal_i-sesgo_i)/escala_i",
+  "gravedad_referencia_m_s2": 9.7726,
+  "unidades_sesgo": "m/s2",
+  "orden_ejes": [
+    "X",
+    "Y",
+    "Z"
+  ],
+  "sesgo_m_s2": {
+    "X": 0.07056033306853138,
+    "Y": 0.026324549853248946,
+    "Z": 0.318508497496806
+  },
+  "escala_adimensional": {
+    "X": 1.0002658431617224,
+    "Y": 1.0006646334725053,
+    "Z": 1.0072651686388379
+  },
+  "mapeo_archivos": {
+    "-Z": "datos_010_fisico.csv",
+    "+Z": "datos_011_fisico.csv",
+    "-X": "datos_012_fisico.csv",
+    "+X": "datos_013_fisico.csv",
+    "-Y": "datos_014_fisico.csv",
+    "+Y": "datos_015_fisico.csv"
+  },
+  "limitaciones": [
+    "Gravedad local de referencia del proyecto: Quito (9.7726 m/s2)",
+    "Modelo diagonal: no corrige desalineacion, no ortogonalidad ni acoplamiento cruzado",
+    "Posibles inclinaciones de las seis orientaciones",
+    "No corrige orientacion, gravedad 3D ni sesgo del giroscopio"
+  ],
+  "validacion_reposo": {
+    "archivo": "datos_009_fisico.csv",
+    "muestras": 376070,
+    "norma_media_original": 10.220236757601166,
+    "norma_media_calibrada": 9.826345495461366,
+    "error_norma_original": 0.44763675760116506,
+    "error_norma_calibrada": 0.05374549546136542,
+    "nota": "Validacion cruzada con reposo independiente. No estima error absoluto de posicion ni deriva angular."
+  }
+}

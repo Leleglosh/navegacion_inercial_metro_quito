@@ -1,3 +1,12 @@
+"""Procesamiento del primer parcial: CSV crudo ESP32 + GY-91.
+
+Uso desde la RAIZ del repositorio:
+  python procesamiento/graficar_nivel2.py --csv datos/crudos/datos_006.csv --calib datos/crudos/calib_006.txt
+
+Requiere: pip install numpy pandas matplotlib
+Conserva intactos los datos originales; crea CSV procesado y figuras.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -9,11 +18,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# Aceleracion local provisional para las primeras graficas.
-# Sustituir por un valor fisico justificado para Quito antes del informe final.
-G_REFERENCIA = 9.81  # m/s^2 (provisional)
-SENSIBILIDAD_ACEL = 16384.0  # cuentas/g, rango +/- 2g
-SENSIBILIDAD_GIRO = 131.0  # cuentas/(grados/s), rango +/- 250 grados/s
+from config_fisica import (
+    GRAVEDAD_ESTANDAR_MS2,
+    GRAVEDAD_QUITO_MS2,
+    SENSIBILIDAD_ACEL_CUENTAS_POR_G,
+    SENSIBILIDAD_GIRO_CUENTAS_POR_DPS,
+)
+
+# IMPORTANTE: los 16384 LSB/g del fabricante usan g como unidad estandar.
+# Para convertir las cuentas a m/s2 se usa 9.80665, NO la gravedad local.
+# La referencia local 9.7726 se utiliza despues en reposo y seis caras.
 
 
 def leer_coeficientes_bmp280(ruta: Path) -> dict[str, int]:
@@ -124,8 +138,8 @@ def main():
 
     convertido = pd.DataFrame({"seq":df["seq"], "t_s": t, "t_us":t_us})
     for eje in "xyz":
-        convertido[f"a{eje}_m_s2"] = df[f"a{eje}_raw"].to_numpy(dtype=float) * G_REFERENCIA / SENSIBILIDAD_ACEL
-        convertido[f"g{eje}_deg_s"] = df[f"g{eje}_raw"].to_numpy(dtype=float) / SENSIBILIDAD_GIRO
+        convertido[f"a{eje}_m_s2"] = df[f"a{eje}_raw"].to_numpy(dtype=float) * GRAVEDAD_ESTANDAR_MS2 / SENSIBILIDAD_ACEL_CUENTAS_POR_G
+        convertido[f"g{eje}_deg_s"] = df[f"g{eje}_raw"].to_numpy(dtype=float) / SENSIBILIDAD_GIRO_CUENTAS_POR_DPS
 
     coef = leer_coeficientes_bmp280(calib)
     temp_c, presion_pa = compensar_bmp280(df["t_raw"], df["p_raw"], coef)
@@ -153,7 +167,7 @@ def main():
     dt_ms = np.diff(t) * 1000.0
     plt.figure(figsize=(11, 4.5))
     plt.plot(t[1:], dt_ms, linewidth=0.8, label="Intervalo observado")
-    plt.axhline(9.5, linestyle="--", alpha=0.7, label="Periodo objetivo CSV 006: 9.5 ms")
+    plt.axhline(9.5, linestyle="--", alpha=0.7, label="Periodo objetivo (firmware): 9.5 ms")
     plt.xlabel("Tiempo desde la primera muestra (s)")
     plt.ylabel("Intervalo entre registros (ms)")
     plt.title(f"Regularidad de adquisicion - {prefijo}")
@@ -168,6 +182,8 @@ def main():
 
     dt = np.diff(t)
     print("=== ANALISIS DEL REGISTRO Y GRAFICAS ===")
+    print(f"Conversion de cuentas/g a m/s2: g_estandar = {GRAVEDAD_ESTANDAR_MS2:.5f} m/s2")
+    print(f"Referencia de gravedad para Quito: g_local = {GRAVEDAD_QUITO_MS2:.4f} m/s2")
     print(f"CSV: {csv.name}")
     print(f"Muestras: {len(df)}")
     print(f"Duracion: {t[-1]:.3f} s")
