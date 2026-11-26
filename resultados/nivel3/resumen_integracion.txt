@@ -1,0 +1,29 @@
+=== NIVEL 3: datos_009_fisico, ANTES Y DESPUES DE CALIBRAR ===
+CSV: datos_009_fisico.csv | Parametros: parametros_calibracion.json
+Muestras: 376070; duracion: 3599.996 s; frecuencia media: 104.464 Hz
+Intervalo maximo: 839.587 ms; dt >15ms: 3847
+Gravedad local Quito: 9.7726 m/s2
+Vector vertical aproximado (X,Y,Z): [0.057538, 0.028137, 0.997947]
+Norma media ANTES: 10.220237 m/s2 (diferencia +0.447637)
+Norma media DESPUES: 9.826345 m/s2 (diferencia +0.053745)
+Reduccion |diferencia de norma|: 87.99%
+Residual proyectado ANTES: media +0.447512, desv 0.017299 m/s2
+Residual proyectado DESPUES: media +0.053745, desv 0.017174 m/s2
+
+METODO: taylor (Taylor grados 1 y 2)
+  SIN calibrar: v_final=+1611.0452 m/s; x_final=+2897202.64 m
+  CALIBRADO:    v_final=+193.4884 m/s; x_final=+345624.74 m
+  Reduccion de |desplazamiento ficticio final|: 88.07%
+
+METODO: interpolacion (interpolacion lineal de aceleracion)
+  SIN calibrar: v_final=+1611.0512 m/s; x_final=+2897206.35 m
+  CALIBRADO:    v_final=+193.4944 m/s; x_final=+345628.42 m
+  Reduccion de |desplazamiento ficticio final|: 88.07%
+
+AVISO: pausas de adquisicion >100 ms; incluidas mediante dt real
+NOTA METODOLOGICA: no es posicion real, ni integra rotaciones/giroscopio.
+La referencia vertical se aproxima con el promedio calibrado del propio reposo.
+Las dos series usan la MISMA direccion; no se centra la media por separado.
+Taylor supone aceleracion constante dentro de cada intervalo; interpolacion supone variacion lineal.
+La calibracion se obtuvo de los CSV 010-015, no del reposo 009.
+En reposo, la referencia fisica del desplazamiento es 0 m.

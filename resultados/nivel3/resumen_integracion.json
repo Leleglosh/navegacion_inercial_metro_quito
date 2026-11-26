@@ -1,0 +1,45 @@
+{
+  "archivo_reposo": "datos_009_fisico.csv",
+  "archivo_calibracion": "parametros_calibracion.json",
+  "gravedad_local_m_s2": 9.7726,
+  "muestras": 376070,
+  "duracion_s": 3599.996472,
+  "frecuencia_media_hz": 104.46371348555033,
+  "intervalo_maximo_ms": 839.5869999999377,
+  "intervalos_mayores_15ms": 3847,
+  "direccion_vertical_estimada_3d": [
+    0.05753833783559626,
+    0.02813738716340434,
+    0.9979467055523223
+  ],
+  "norma_media_antes_m_s2": 10.220236757601166,
+  "norma_media_despues_m_s2": 9.826345495461366,
+  "diferencia_norma_antes_m_s2": 0.44763675760116506,
+  "diferencia_norma_despues_m_s2": 0.05374549546136542,
+  "reduccion_diferencia_norma_pct": 87.99350264500586,
+  "residuo_antes_media_m_s2": 0.4475116369934589,
+  "residuo_despues_media_m_s2": 0.05374549546136576,
+  "residuo_antes_std_m_s2": 0.017299033710293295,
+  "residuo_despues_std_m_s2": 0.017174421330982435,
+  "descripcion_metodos": {
+    "taylor": "Taylor grado 1 para velocidad y grado 2 para posicion; aceleracion constante por intervalo",
+    "interpolacion": "integracion exacta de la interpolacion lineal de la aceleracion en cada intervalo"
+  },
+  "metodos": {
+    "taylor": {
+      "velocidad_final_antes_m_s": 1611.0452011132504,
+      "velocidad_final_despues_m_s": 193.48844216433372,
+      "desplazamiento_final_antes_m": 2897202.638969992,
+      "desplazamiento_final_despues_m": 345624.73600907944,
+      "reduccion_desplazamiento_absoluto_pct": 88.07039827452472
+    },
+    "interpolacion": {
+      "velocidad_final_antes_m_s": 1611.0511544220103,
+      "velocidad_final_despues_m_s": 193.49435563251689,
+      "desplazamiento_final_antes_m": 2897206.3485980234,
+      "desplazamiento_final_despues_m": 345628.4224342009,
+      "reduccion_desplazamiento_absoluto_pct": 88.07028630869
+    }
+  },
+  "interpretacion": "Desplazamiento ficticio escalar por doble integracion del residual de aceleracion en direccion de gravedad estimada. No constituye la trayectoria 3D ni garantiza precision de navegacion. Ambas series usan una misma direccion proyectada y los tiempos reales. Metodos: Taylor e interpolacion lineal por intervalos."
+}
