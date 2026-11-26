@@ -345,9 +345,14 @@ Este resultado evidencia la necesidad de comprobar experimentalmente el comporta
 - Código `adquisicion_esp32.ino`.
 - Archivo original `datos_001.csv`.
 - Archivo de configuración y calibración interna `calib_001.txt`.
-- Código de análisis `verificar.py`.
+- Código de análisis `verificar_registro.py` en /procesamiento.
 - Captura de los resultados del análisis en Python.
+
+![1795653781403](../documentacion/fotografias/1795653781403.png)
+
 - Fotografías del montaje completo.
+
+![1795654306925](../documentacion/fotografias/1795654306925.png)
 
 ### Pruebas adicionales de optimización de la frecuencia de muestreo
 
@@ -401,3 +406,155 @@ La comunicación I²C no reportó fallos durante la prueba, pero la frecuencia m
 - Realizar el experimento de reposo.
 - Realizar el experimento de seis caras para caracterizar y calibrar el acelerómetro.
 - Analizar el crecimiento del error mediante integración numérica.
+
+
+
+## Entrada 006 — Procesamiento de datos crudos y generación de gráficas en unidades físicas
+
+**Fecha:** 25/11/2026
+**Actividad:** Procesamiento de las mediciones del GY-91 mediante Python y análisis de las señales registradas.
+
+### Objetivo
+
+Desarrollar y ejecutar un programa que permita leer los datos crudos obtenidos por el ESP32, convertirlos a unidades físicas y representar gráficamente el comportamiento del acelerómetro, giroscopio y barómetro.
+
+También se buscó analizar la regularidad de adquisición y comprobar la representación de los eventos registrados mediante el pulsador.
+
+### Procedimiento
+
+1. Se utilizó el archivo `datos_006.csv`, generado durante una prueba de aproximadamente 60 segundos con una frecuencia objetivo de 105,26 Hz.
+2. Se utilizó el archivo `calib_006.txt`, que contiene la configuración de los sensores y los coeficientes internos de compensación del BMP280.
+3. Se desarrolló y ejecutó el programa `graficar_nivel2.py`, utilizando las bibliotecas NumPy, Pandas y Matplotlib.
+4. Las lecturas crudas del acelerómetro se convirtieron a m/s², utilizando la sensibilidad nominal de 16384 cuentas por g, correspondiente al rango de ±2g.
+5. Las lecturas del giroscopio se convirtieron a grados por segundo, utilizando la sensibilidad nominal de 131 cuentas por °/s, correspondiente al rango de ±250°/s.
+6. La presión y temperatura del BMP280 se calcularon mediante los coeficientes de compensación proporcionados por el fabricante y almacenados en el propio sensor.
+7. Se generaron gráficas de aceleración, velocidad angular, presión, temperatura y regularidad temporal.
+8. Se representaron las marcas de tiempo correspondientes a las tres pulsaciones registradas durante la prueba.
+9. Se guardaron las señales convertidas en `datos_006_fisico.csv`, conservando sin modificaciones el archivo original.
+
+### Resultados obtenidos
+
+**Características generales del registro:**
+
+| Indicador           | Resultado  |
+| ------------------- | ---------- |
+| Número de muestras | 6265       |
+| Duración           | 59,992 s   |
+| Frecuencia media    | 104,41 Hz  |
+| Intervalo máximo   | 100,755 ms |
+| Intervalos omitidos | 51         |
+| Fallos I²C         | 0          |
+| Eventos registrados | 3          |
+| Presión media      | 72579 Pa   |
+| Temperatura media   | 26,87 °C  |
+
+### Análisis de las gráficas
+
+**1. Aceleración**
+
+Las señales de aceleración muestran valores relativamente estables durante gran parte del registro, junto con variaciones pronunciadas en determinados momentos.
+
+Se observaron valores aproximados de 2,7 m/s² en X, -2,8 m/s² en Y y -8,7 m/s² en Z durante algunos períodos de estabilidad.
+
+Estos resultados son compatibles con un sensor inclinado, ya que la gravedad se proyecta sobre los tres ejes.
+
+La magnitud aproximada calculada a partir de dichos valores es de 9,53 m/s², cercana a la gravedad.
+
+Sin embargo, todavía no se ha realizado la calibración experimental para determinar el sesgo y los errores de escala.
+
+**2. Velocidad angular**
+
+El giroscopio registró valores cercanos a cero en períodos de aparente reposo y variaciones importantes durante los movimientos.
+
+En determinados instantes, la velocidad angular del eje Z alcanzó valores cercanos a 160°/s.
+
+Esto permitió comprobar que el sensor responde a los cambios de orientación y que el programa convierte sus lecturas a unidades físicas.
+
+**3. Presión atmosférica**
+
+El BMP280 registró una presión media compensada de 72579 Pa, equivalente a aproximadamente 725,79 hPa.
+
+Se observaron pequeñas fluctuaciones en la señal, incluso durante períodos en los que no se realizaron movimientos evidentes.
+
+Estos cambios deberán considerarse posteriormente al estimar variaciones de altura mediante el barómetro.
+
+**4. Temperatura**
+
+La temperatura compensada presentó un incremento aproximado desde 26,43 °C hasta 27,22 °C durante el registro.
+
+Una posible explicación es el calentamiento del dispositivo o los cambios en sus condiciones ambientales, aunque no se cuenta todavía con información suficiente para determinar la causa.
+
+**5. Regularidad temporal**
+
+La gráfica de intervalos entre mediciones mostró que la mayoría de las muestras se obtuvieron cerca del período objetivo de 9,5 ms.
+
+Sin embargo, se identificaron intervalos mayores y una pausa máxima de 100,755 ms.
+
+Aunque la frecuencia media superó los 100 Hz, todavía existen irregularidades que deberán corregirse para garantizar registros continuos sin pérdidas.
+
+### Observaciones sobre el montaje
+
+Durante la adquisición del archivo `datos_006.csv`, el módulo GY-91 se encontraba inclinado y sostenido mediante cables de conexión, sin estar fijado rígidamente sobre una superficie.
+
+Esta condición pudo producir pequeños movimientos o vibraciones adicionales, los cuales influyen en las mediciones de aceleración y velocidad angular.
+
+Por tanto, el registro es válido como prueba de adquisición, conversión y visualización de datos, pero no se utilizará para determinar de manera definitiva el sesgo y ruido del sensor en reposo.
+
+Se decidió realizar los siguientes experimentos con el sensor fijado a una superficie firme, manteniendo una orientación conocida y estable.
+
+### Decisiones técnicas
+
+Se decidió conservar los archivos originales de adquisición y almacenar por separado los datos procesados.
+
+También se estableció la siguiente organización:
+
+- `datos/crudos/`: archivos CSV originales.
+- `datos/metadatos/`: configuraciones, coeficientes de compensación y descripción de experimentos.
+- `datos/procesados/`: mediciones convertidas a unidades físicas.
+- `resultados/graficas/`: gráficas obtenidas con Python.
+
+Se decidió mantener el registro `datos_006.csv` como evidencia del funcionamiento del sistema, sin utilizarlo como sustituto de los experimentos formales de reposo y seis caras.
+
+### Problemas y limitaciones identificados
+
+El montaje provisional no garantiza que el sensor permanezca inmóvil durante una prueba prolongada.
+
+Adicionalmente, las señales de aceleración todavía contienen el efecto de la gravedad y no han sido corregidas mediante una calibración experimental.
+
+Las variaciones de orientación también deben considerarse antes de integrar la aceleración para estimar velocidad y posición.
+
+Por otra parte, la adquisición presenta algunas interrupciones temporales, pese a alcanzar una frecuencia media superior a 100 Hz.
+
+### Uso de inteligencia artificial
+
+Se utilizó ChatGPT como apoyo para elaborar el programa de procesamiento en Python, interpretar los formatos de datos, convertir las mediciones crudas a unidades físicas y generar las gráficas.
+
+Los resultados fueron contrastados con los registros producidos por el prototipo y las configuraciones utilizadas en los sensores.
+
+También se revisaron las limitaciones del montaje y se identificó que las mediciones realizadas con el sensor suspendido no son adecuadas para una caracterización formal del reposo.
+
+### Evidencias
+
+- `datos_006.csv`: mediciones crudas.
+- `calib_006.txt`: configuración y coeficientes internos del BMP280.
+- `graficar_nivel2.py`: programa de procesamiento.
+- `datos_006_fisico.csv`: mediciones convertidas.
+- `datos_006_aceleracion.png`.
+- `datos_006_giroscopio.png`.
+- `datos_006_presion.png`.
+- `datos_006_temperatura.png`.
+- `datos_006_intervalos.png`.
+
+### Estado del proyecto
+
+Se completó la adquisición de datos crudos con marcas de tiempo y su procesamiento mediante un programa que genera gráficas en unidades físicas.
+
+Con estas evidencias se cubren los requisitos técnicos principales del nivel 2 del primer parcial.
+
+Queda pendiente la caracterización formal del sensor mediante los experimentos de reposo y seis caras, así como el análisis del crecimiento del error mediante integración numérica.
+
+### Próximas actividades
+
+Preparar un montaje estable para el GY-91, realizar una prueba breve de reposo para verificar su funcionamiento y posteriormente registrar el experimento de reposo de una hora.
+
+Después se realizará el experimento de seis caras para estimar el sesgo y los factores de escala del acelerómetro, y se aplicarán métodos numéricos para analizar la acumulación del error.

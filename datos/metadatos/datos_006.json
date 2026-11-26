@@ -1,0 +1,40 @@
+
+{
+  "id": "datos_006",
+  "fecha": "2026-11-25",
+  "hora_inicio": "11:30",
+  "lugar": "Biblioteca de la Facultad de Ingeniería Química",
+  "tipo_experimento": "prueba_adquisicion",
+  "descripcion": "Prueba de registro con movimientos y pulsador",
+  "hardware": {
+    "microcontrolador": "ESP32-WROOM-32D",
+    "modulo": "GY-91",
+    "imu_identificador": "0x70",
+    "imu_probable": "MPU-6500",
+    "barometro": "BMP280",
+    "barometro_identificador": "0x58",
+    "microSD_GB": 16
+  },
+  "configuracion": {
+    "acelerometro_rango_g": 2,
+    "giroscopio_rango_dps": 250,
+    "i2c_hz": 400000,
+    "spi_hz": 4000000,
+    "periodo_objetivo_us": 9500,
+    "tiempo_referencia": "microsegundos desde arranque"
+  },
+  "resultados_adquisicion": {
+    "muestras": 6265,
+    "duracion_s": 59.992,
+    "frecuencia_media_hz": 104.41,
+    "intervalo_maximo_ms": 100.755,
+    "intervalos_omitidos": 51,
+    "fallos_i2c": 0,
+    "eventos": 3
+  },
+  "archivo_crudo": "datos_006.csv",
+  "archivo_coeficientes": "calib_006.txt",
+  "orientacion_sensor": "Cara inferior (-Z) hacia arriba e inclinado",
+  "alimentacion": "USB",
+  "observaciones": "Se observaron pausas en la adquisicion."
+}
